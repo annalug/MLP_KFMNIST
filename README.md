@@ -12,5 +12,6 @@ The visualization is also compiled into a streamlit script. To do this, just ins
 ```bash
 streamlit run mlp_app.py
 
+```
 
 by: Ananda Heino, Ana Luisa Schmidt e Anna Luiza Gomes.
