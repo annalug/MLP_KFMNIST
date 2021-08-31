@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # for better image plotting
-%matplotlib inline
-%config InlineBackend.figure_format = 'retina'
+# %matplotlib inline
+# %config InlineBackend.figure_format = 'retina'
 
 import pandas as pd
 import numpy as np
@@ -16,6 +16,7 @@ import seaborn as sns
 from collections import OrderedDict
 from neural_reg import NeuralNetwork_reg
 from neural import NeuralNetwork
+from Neuralnet import Pipeline
 
 
 class Pipeline(self):
