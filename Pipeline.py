@@ -16,10 +16,10 @@ import seaborn as sns
 from collections import OrderedDict
 from neural_reg import NeuralNetwork_reg
 from neural import NeuralNetwork
-from Neuralnet import Pipeline
 
 
-class Pipeline(self):
+
+class Pipeline():
 
     def __init__(self, dataset='KMNIST', horizontal_flip=False, flip_percentage=0.5,
                    random_rotation=False, rotation_degree=20,   random_perspective=False, distortion_scale=0.6,
@@ -69,6 +69,8 @@ class Pipeline(self):
             self.test_dataset = datasets.FashionMNIST('./data/', download=True, train=False, transform=self.transformations)
 
     def Validation(self):
+
+        self.validation_size = validation_size
         # Get the size of our train set
         training_size = len(self.train_dataset)
         # then, we create a list of indices from 0 to training size range
@@ -76,9 +78,9 @@ class Pipeline(self):
         # Shuffling the indices
         np.random.shuffle(indices)
         # The shuffled index will split the validation and training datasets using numpy "floor" method:
-        index_split = int(np.floor(training_size * validation_size))  # floor of the scalar `x` is the largest integer
+        self.index_split = int(np.floor(training_size * validation_size))  # floor of the scalar `x` is the largest integer
         # Then, we get the training and validation set indices passing the index split
-        validation_indices, training_indices = indices[:index_split], indices[index_split:]
+        validation_indices, training_indices = indices[index_split], indices[index_split:]
         # Using SubsetRandomSampler we sample elements randomly from a list of indices
         self.training_sample = SubsetRandomSampler(training_indices)
         self.validation_sample = SubsetRandomSampler(validation_indices)
@@ -86,9 +88,9 @@ class Pipeline(self):
 
     def Loader(self):
         ### creating the data loader, passing the sampler created above
-        self.train_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=batch_size, sampler=self.training_sample)
-        self.valid_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=batch_size, sampler=self.validation_sample)
-        self.test_loader = torch.utils.data.DataLoader(self.test_dataset, batch_size=batch_size)
+        self.train_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, sampler=self.training_sample)
+        self.valid_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, sampler=self.validation_sample)
+        self.test_loader = torch.utils.data.DataLoader(self.test_dataset, batch_size=self.batch_size)
 
 
     def Model(self):
@@ -162,6 +164,8 @@ class Pipeline(self):
         ps = torch.exp(logps)
         view_classify(img.view(1, 28, 28), ps, train_losses, test_losses, version=dataset)
 
-        return (accuracy / len(test_loader)), train_losses, test_losses
+        acc = (accuracy / len(test_loader))
+
+        return acc, train_losses, test_losses
 
 
