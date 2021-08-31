@@ -13,16 +13,15 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import seaborn as sns
-from collections import OrderedDict
 from neural_reg import NeuralNetwork_reg
 from neural import NeuralNetwork
-
-
+from view_classify import view_classify
+import streamlit as st
 
 class Pipeline():
 
     def __init__(self, dataset='KMNIST', horizontal_flip=False, flip_percentage=0.5,
-                   random_rotation=False, rotation_degree=20,   random_perspective=False, distortion_scale=0.6,
+                   random_rotation=False, rotation_degree=20, random_perspective=False, distortion_scale=0.6,
                    reg=False,  validation_size=0.2,  loss='cross', optimizer='adam',  epochs=5, lr_rate=0.002, batch_size=200):
 
         self.dataset = dataset
@@ -48,8 +47,8 @@ class Pipeline():
                                               transforms.Normalize((0.5,), (0.5,))])
 
         self.Createdataset()
-        self.Validation()
-        self.Loader()
+        self.Validation_loader()
+       # self.Loader()
         self.Model()
         self.Loss()
         self.Optmizer()
@@ -68,9 +67,8 @@ class Pipeline():
             self.train_dataset = datasets.FashionMNIST('./data', download=True, train=True, transform=self.transformations)
             self.test_dataset = datasets.FashionMNIST('./data/', download=True, train=False, transform=self.transformations)
 
-    def Validation(self):
+    def Validation_loader(self):
 
-        self.validation_size = validation_size
         # Get the size of our train set
         training_size = len(self.train_dataset)
         # then, we create a list of indices from 0 to training size range
@@ -78,15 +76,13 @@ class Pipeline():
         # Shuffling the indices
         np.random.shuffle(indices)
         # The shuffled index will split the validation and training datasets using numpy "floor" method:
-        self.index_split = int(np.floor(training_size * validation_size))  # floor of the scalar `x` is the largest integer
+        index_split = int(np.floor(training_size * self.validation_size))  # floor of the scalar `x` is the largest integer
         # Then, we get the training and validation set indices passing the index split
         validation_indices, training_indices = indices[index_split], indices[index_split:]
         # Using SubsetRandomSampler we sample elements randomly from a list of indices
         self.training_sample = SubsetRandomSampler(training_indices)
         self.validation_sample = SubsetRandomSampler(validation_indices)
 
-
-    def Loader(self):
         ### creating the data loader, passing the sampler created above
         self.train_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, sampler=self.training_sample)
         self.valid_loader = torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, sampler=self.validation_sample)
@@ -117,7 +113,7 @@ class Pipeline():
             self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr_rate)
         if self.optimizer == 'adamax':
             self.optimizer = optim.Adamax(self.model.parameters(), lr=self.lr_rate)
-        if optimizer == 'asgd':
+        if self.optimizer == 'asgd':
             self.optimizer = optim.ASGD(self.model.parameters(), lr=self.lr_rate)
 
     def Train(self):
@@ -137,23 +133,27 @@ class Pipeline():
                 accuracy = 0
                 with torch.no_grad():
                     self.model.eval()
-                    for image, label in test_loader:
+                    for image, label in self.test_loader:
                         log_ps = self.model.forward(image)
                         prob = torch.exp(log_ps)
-                        test_loss += criterion(log_ps, label)
+                        test_loss += self.criterion(log_ps, label)
                         k_prob, k_class = prob.topk(1, dim=1)
                         equals = k_class == label.view(*k_class.shape)
                         accuracy += torch.mean(equals.type(torch.FloatTensor))
                 self.model.train()
-            train_losses.append(running_loss / len(train_loader))
-            test_losses.append(test_loss / len(test_loader))
-            print("Epoch: {}/{}...".format(e + 1, epochs),
+            train_losses.append(running_loss / len(self.train_loader))
+            test_losses.append(test_loss / len(self.test_loader))
+            print("Epoch: {}/{}...".format(e + 1, self.epochs),
                   "Training Loss: {:.3f}...".format(train_losses[-1]),
                   "Test Loss: {:.3f}...".format(test_losses[-1]),
-                  "Test Accuracy: {:.3f}".format(accuracy / len(test_loader)))
+                  "Test Accuracy: {:.3f}".format(accuracy / len(self.test_loader)))
+        self.train_losses = train_losses
+        self.test_losses = test_losses
+        self.accuracy = accuracy
 
+    def Graph(self):
         ### Showing the image and the probability barplot
-        images, labels = next(iter(train_loader))
+        images, labels = next(iter(self.train_loader))
 
         img = images[0].view(1, 784)
         # gradient OFF
@@ -162,10 +162,11 @@ class Pipeline():
 
         # We need the exp to see the real predictions
         ps = torch.exp(logps)
-        view_classify(img.view(1, 28, 28), ps, train_losses, test_losses, version=dataset)
+        view_classify(img.view(1, 28, 28), ps, self.train_losses, self.test_losses, version=self.dataset)
+        st.pyplot()
 
-        acc = (accuracy / len(test_loader))
+        self.acc = (self.accuracy / len(self.test_loader))
 
-        return acc, train_losses, test_losses
+        return self.acc
 
 
