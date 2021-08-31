@@ -1,21 +1,12 @@
 # -*- coding: utf-8 -*-
-# for better image plotting
-# %matplotlib inline
-# %config InlineBackend.figure_format = 'retina'
-
-import pandas as pd
 import numpy as np
 import torch
 from torchvision import datasets, transforms
 from torch import nn, optim
-from torch.autograd import Variable
 from torch.utils.data.sampler import SubsetRandomSampler
-import torch.nn.functional as F
-import matplotlib.pyplot as plt
-import seaborn as sns
-from neural_reg import NeuralNetwork_reg
-from neural import NeuralNetwork
-from view_classify import view_classify
+from sections.NeuralNetwork_reg import NeuralNetwork_reg
+from sections.NeuralNetwork import NeuralNetwork
+from sections.view_classify import view_classify
 import streamlit as st
 
 class Pipeline():

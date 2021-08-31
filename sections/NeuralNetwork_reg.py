@@ -1,14 +1,5 @@
-import pandas as pd
-import numpy as np
-import torch
-from torchvision import datasets, transforms
 from torch import nn, optim
-from torch.autograd import Variable
-from torch.utils.data.sampler import SubsetRandomSampler
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-import seaborn as sns
-from collections import OrderedDict
 
 ## ---> With regularization: Dropout
 
