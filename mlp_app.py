@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import streamlit as st
+import numpy as np
 from Pipeline import Pipeline
 from neural_reg import NeuralNetwork_reg
 from neural import NeuralNetwork
