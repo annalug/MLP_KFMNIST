@@ -14,4 +14,4 @@ streamlit run mlp_app.py
 
 ```
 
-by: Ananda Heino, Ana Luisa Schmidt e Anna Luiza Gomes.
+by: Ananda Heino (github.com/anandaheino), Ana Luisa Schmidt (github.com/analuisaschmidt) e Anna Luiza Gomes.
