@@ -45,6 +45,7 @@ class Pipeline():
         self.Optmizer()
 
 
+
     def Createdataset(self):
 
         ### Downloading the training and test data depending on the dataset variable passed as a string
@@ -162,6 +163,10 @@ class Pipeline():
 
         self.acc = (accuracy / len(self.test_loader))
 
+    def Images(self):
+        images, labels = next(iter(self.train_loader))
+
+        return images, labels
 
 
 

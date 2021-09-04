@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
 
 import streamlit as st
-import numpy as np
-from sections.Pipeline import Pipeline
-
+from sections.model import *
+from sections.introd import *
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-st.title('Multilayer perceptron with MNIST,FMNIST and KMNIST')
+st.sidebar.title("Sections")
+section = st.sidebar.radio(
+    "Go to:",
+    ( 'Intro', 'Model'))
+
+if section == 'Model':
+    model()
+elif section == 'Intro':
+    introd()
 
 
-optmizers = ['adamax','adam','asgd']
-lr_rates = np.arange(0.001,0.01,0.003)
-datasets = ['MNIST','FashionMNIST','KMNIST']
 
-datasets = st.selectbox('Select the dataset', datasets)
-lr_rates = st.selectbox('Select the learning rate', lr_rates)
-optmizers = st.selectbox('Select the optmizer', optmizers)
-
-
-model_nn= Pipeline(dataset=datasets,lr_rate=lr_rates, random_perspective=True, distortion_scale=0.8, optimizer=optmizers)
-
-if st.checkbox('Train the model'):
-    model_nn.Train()
-
-# if st.checkbox('Image, classification and Train-Test losses'):
-#     model_nn.Graph()
 
 
